@@ -97,3 +97,5 @@ gradle/
 .externalNativeBuild/
 gradlew
 gradlew.bat
+
+dependencies/firebase_cpp_sdk/
