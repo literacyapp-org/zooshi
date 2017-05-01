@@ -7,12 +7,22 @@ language: android
 android:
   components:
     - tools
-    - build-tools-23.0.3
+    - build-tools-23.0.1
     - android-23
     - extra-google-m2repository
     - extra-android-m2repository
 
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - g++-5
+
 before_install:
+    - export CXX="g++-5" CC="gcc-5"
+    - sudo apt-get update -q
     - sudo apt-get install webp python
     - echo `python --version`
     - export ANDROID_SDK_ROOT=/usr/local/android-sdk
