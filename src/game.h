@@ -43,10 +43,6 @@
 #include "world.h"
 #include "xp_system.h"
 
-#ifdef __ANDROID__
-#define USING_GOOGLE_PLAY_GAMES
-#endif
-
 #define DISPLAY_FRAMERATE_HISTOGRAM 0
 
 #ifdef __ANDROID__

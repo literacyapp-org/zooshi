@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+LOCAL_PATH:=$(call my-dir)
+
+# Project directory relative to this file.
+ZOOSHI_DIR:=$(LOCAL_PATH)/../../..
+include $(ZOOSHI_DIR)/jni/android_config.mk
+
 LOCAL_PATH:=$(call my-dir)/../../..
 
 # Project directory relative to this file.
@@ -102,7 +108,6 @@ LOCAL_C_INCLUDES := \
   $(DEPENDENCIES_BREADBOARD_MODULE_LIBRARY_DIR)/include \
   $(DEPENDENCIES_SCENE_LAB_DIR)/include \
   $(DEPENDENCIES_FPLUTIL_DIR)/libfplutil/include \
-  $(DEPENDENCIES_GPG_DIR)/include \
   $(DEPENDENCIES_WEBP_DIR)/src \
   $(DEPENDENCIES_BULLETPHYSICS_DIR)/src \
   $(DEPENDENCIES_FIREBASE_DIR)/include \
@@ -197,7 +202,7 @@ ZOOSHI_FLATBUFFER_INCLUDE_DIRS := \
   $(DEPENDENCIES_BREADBOARD_MODULE_LIBRARY_DIR)/schemas
 
 # Override JNI_OnLoad functions.
-FPLBASE_JNI_ONLOAD_FUNCTIONS := SDL_JNI_OnLoad GPG_JNI_OnLoad
+FPLBASE_JNI_ONLOAD_FUNCTIONS := SDL_JNI_OnLoad
 
 ifeq (,$(ZOOSHI_RUN_ONCE))
 ZOOSHI_RUN_ONCE := 1
@@ -226,7 +231,6 @@ clean: clean_assets clean_generated_includes
 LOCAL_STATIC_LIBRARIES := \
   libbreadboard \
   libbreadboard_module_library \
-  libgpg \
   libmathfu \
   libwebp \
   libfplbase \
@@ -279,4 +283,3 @@ $(call import-module,motive/jni)
 $(call import-module,corgi/component_library/jni)
 $(call import-module,scene_lab/jni)
 $(call import-module,$(notdir $(DEPENDENCIES_WEBP_DIR)))
-

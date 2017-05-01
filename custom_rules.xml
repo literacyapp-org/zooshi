@@ -30,24 +30,6 @@ limitations under the License.
     <os family="windows" />
   </condition>
 
-  <target name="initialize-google-play-games_lib"
-          description="Initialize Google Play Games library in the project.">
-    <!-- Copy the library to the project. -->
-    <!-- Temporarily disable this while we use a debug version of the lib -->
-    <copy todir="google-play-services_lib">
-      <fileset dir="${sdk.dir}/extras/google/google_play_services/libproject/google-play-services_lib"/>
-    </copy>
-    <!-- Create an ant project for the library. -->
-    <exec executable="${android_exe}">
-      <arg value="update"/>
-      <arg value="project"/>
-      <arg value="-p"/>
-      <arg value="google-play-services_lib"/>
-      <arg value="-t"/>
-      <arg value="${target}"/>
-    </exec>
-  </target>
-
   <target name="initialize-android-support_lib"
           description="Initialize Android Support library in the project.">
     <!-- Copy the library to the project. -->
@@ -57,8 +39,6 @@ limitations under the License.
   </target>
 
   <target name="-pre-build" depends="fplbase.setup-fplbase,
-                                     initialize-google-play-games_lib,
                                      initialize-android-support_lib"/>
-  <target name="-pre-clean" depends="initialize-google-play-games_lib,
-                                     initialize-android-support_lib" />
+  <target name="-pre-clean" depends="initialize-android-support_lib" />
 </project>
