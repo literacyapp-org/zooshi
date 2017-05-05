@@ -30,8 +30,6 @@
 
 #include "mathfu/internal/disable_warnings_begin.h"
 
-#include "firebase/analytics.h"
-
 #include "mathfu/internal/disable_warnings_end.h"
 
 #include "fplbase/debug_markers.h"
@@ -63,7 +61,6 @@
 #include "motive/math/angle.h"
 #include "motive/util/benchmark.h"
 #include "pindrop/pindrop.h"
-#include "remote_config.h"
 #include "world.h"
 
 #ifdef __ANDROID__
@@ -411,25 +408,9 @@ bool Game::Initialize(const char *const binary_directory) {
 
   scene_lab_.reset(new scene_lab::SceneLab());
 
-// Initialize Firebase and the services.
-#ifdef __ANDROID__
-  firebase_app_ =
-      firebase::App::Create(firebase::AppOptions(), fplbase::AndroidGetJNIEnv(),
-                            fplbase::AndroidGetActivity());
-#else
-  firebase_app_ = firebase::App::Create(firebase::AppOptions());
-#endif  // __ANDROID__
-  admob_helper_.Initialize(*firebase_app_);
-  firebase::analytics::Initialize(*firebase_app_);
-  firebase::invites::Initialize(*firebase_app_);
-  firebase::invites::SetListener(&invites_listener_);
-  firebase::messaging::Initialize(*firebase_app_, &message_listener_);
-  InitializeRemoteConfig(*firebase_app_);
-
   world_.Initialize(GetConfig(), &input_, &asset_manager_, &world_renderer_,
                     &font_manager_, &audio_engine_, &graph_factory_, &renderer_,
-                    scene_lab_.get(), &unlockable_manager_, &xp_system_,
-                    &invites_listener_, &message_listener_, &admob_helper_);
+                    scene_lab_.get(), &unlockable_manager_, &xp_system_);
 
 #if FPLBASE_ANDROID_VR
   if (fplbase::SupportsHeadMountedDisplay()) {

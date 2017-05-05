@@ -174,11 +174,6 @@ class Game {
   // Shaders we use.
   fplbase::Shader* shader_textured_;
 
-  firebase::App* firebase_app_;
-  InvitesListener invites_listener_;
-  MessageListener message_listener_;
-  AdMobHelper admob_helper_;
-
 #if DISPLAY_FRAMERATE_HISTOGRAM
   // Profiling data.
   static const int kHistogramSize = 64;

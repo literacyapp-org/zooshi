@@ -14,11 +14,7 @@
 
 #include "states/gameplay_state.h"
 
-#include "analytics.h"
-
 #include "mathfu/internal/disable_warnings_begin.h"
-
-#include "firebase/analytics.h"
 
 #include "mathfu/internal/disable_warnings_end.h"
 
@@ -226,9 +222,6 @@ void GameplayState::OnEnter(int previous_state) {
   if (previous_state != kGameStatePause) {
     // Set the start time, so elapsed time can be tracked.
     world_->gameplay_start_time = input_system_->Time();
-    firebase::analytics::LogEvent(kEventGameplayStart,
-                                  kParameterControlScheme,
-                                  AnalyticsControlValue(world_));
   }
 }
 

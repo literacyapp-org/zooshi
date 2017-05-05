@@ -14,16 +14,11 @@
 
 #include "states/game_over_state.h"
 
-#include "analytics.h"
 #include "components/attributes.h"
 #include "components/sound.h"
 #include "config_generated.h"
 
 #include "mathfu/internal/disable_warnings_begin.h"
-
-#include "firebase/analytics.h"
-#include "firebase/analytics/event_names.h"
-#include "firebase/analytics/parameter_names.h"
 
 #include "mathfu/internal/disable_warnings_end.h"
 
@@ -163,18 +158,6 @@ void GameOverState::OnEnter(int /*previous_state*/) {
   auto attribute_data =
       world_->entity_manager.GetComponentData<AttributesData>(player);
   auto score = attribute_data->attributes[AttributeDef_PatronsFed];
-  firebase::analytics::LogEvent(firebase::analytics::kEventPostScore,
-                                firebase::analytics::kParameterScore,
-                                static_cast<int64_t>(score));
-  firebase::analytics::Parameter parameters[] = {
-      firebase::analytics::Parameter(
-          kParameterElapsedLevelTime,
-          static_cast<float>(input_system_->Time() -
-                             world_->gameplay_start_time)),
-      AnalyticsControlParameter(world_),
-  };
-  firebase::analytics::LogEvent(kEventGameplayFinished, parameters,
-                                sizeof(parameters) / sizeof(parameters[0]));
 
   if (high_score) {
     game_over_channel_ = audio_engine_->PlaySound(sound_high_score_);

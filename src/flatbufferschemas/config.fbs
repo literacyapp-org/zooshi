@@ -202,7 +202,7 @@ table WorldDef {
 
 enum UniqueBonusId : byte {
   NonUnique = 0,
-  AdMobRewardedVideo = 1,
+//  AdMobRewardedVideo = 1,
 }
 
 table Config {

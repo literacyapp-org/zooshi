@@ -16,18 +16,12 @@
 
 #include "mathfu/internal/disable_warnings_begin.h"
 
-#include "firebase/analytics.h"
-#include "firebase/remote_config.h"
-
 #include "mathfu/internal/disable_warnings_end.h"
 
-#include "analytics.h"
 #include "fplbase/debug_markers.h"
 #include "fplbase/utilities.h"
-#include "invites.h"
 #include "states/game_menu_state.h"
 #include "states/states_common.h"
-#include "remote_config.h"
 
 #include <iostream>
 
@@ -139,7 +133,7 @@ MenuState GameMenuState::StartMenu(fplbase::AssetManager& assetman,
     flatui::SetMargin(flatui::Margin(200, 700, 200, 100));
 
     auto event = TextButton(
-        firebase::remote_config::GetString(kConfigMenuPlayGame).c_str(),
+        "Play Game",
         kMenuSize, flatui::Margin(0), sound_start_);
     if (event & flatui::kEventWentUp) {
       next_state = kMenuStateFinished;
@@ -168,32 +162,8 @@ MenuState GameMenuState::StartMenu(fplbase::AssetManager& assetman,
       gpg_manager_->ToggleSignIn();
     }
 #endif
-    // Since sending invites and admob video are currently not supported on
-    // desktop, and the UI space is limited, only offer the option on Android.
-#ifdef __ANDROID__
-    event = TextButton(
-        firebase::remote_config::GetString(kConfigMenuSendInvite).c_str(),
-        kMenuSize, flatui::Margin(0));
-    if (event & flatui::kEventWentUp) {
-      firebase::analytics::LogEvent(kEventMenuSendInvite);
-      SendInvite();
-      next_state = kMenuStateSendingInvite;
-    }
-    if (world_->admob_helper->rewarded_video_available() &&
-        !world_->admob_helper->rewarded_video_watched() &&
-        world_->admob_helper->GetRewardedVideoLocation() ==
-            kRewardedVideoLocationPregame) {
-      event = TextButton(
-          firebase::remote_config::GetString(kConfigMenuOfferVideo).c_str(),
-          kMenuSize, flatui::Margin(0));
-      if (event & flatui::kEventWentUp) {
-        StartRewardedVideo();
-      }
-    }
-#endif  // __ANDROID__
     event = TextButton("Options", kMenuSize, flatui::Margin(0));
     if (event & flatui::kEventWentUp) {
-      firebase::analytics::LogEvent(kEventMenuOptions);
       next_state = kMenuStateOptions;
       options_menu_state_ = kOptionsMenuStateMain;
     }
@@ -221,7 +191,6 @@ MenuState GameMenuState::StartMenu(fplbase::AssetManager& assetman,
         ImageButtonWithLabel(*button_back_, 60, flatui::Margin(60, 35, 40, 50),
                              current_sushi->name()->c_str());
     if (event & flatui::kEventWentUp) {
-      firebase::analytics::LogEvent(kEventMenuSushi);
       next_state = kMenuStateOptions;
       options_menu_state_ = kOptionsMenuStateSushi;
     }
@@ -229,7 +198,6 @@ MenuState GameMenuState::StartMenu(fplbase::AssetManager& assetman,
         ImageButtonWithLabel(*button_back_, 60, flatui::Margin(60, 35, 40, 50),
                              world_->CurrentLevel()->name()->c_str());
     if (event & flatui::kEventWentUp) {
-      firebase::analytics::LogEvent(kEventMenuLevel);
       next_state = kMenuStateOptions;
       options_menu_state_ = kOptionsMenuStateLevel;
     }
@@ -405,7 +373,6 @@ void GameMenuState::OptionMenuMain() {
   if (TextButton("Clear Cache", kButtonSize, flatui::Margin(2)) &
       flatui::kEventWentUp) {
     world_->unlockables->LockAll();
-    world_->invites_listener->Reset();
   }
 }
 
@@ -791,22 +758,6 @@ MenuState GameMenuState::ScoreReviewMenu(fplbase::AssetManager& assetman,
     }
     flatui::EndGroup();
 
-    if (world_->admob_helper->rewarded_video_available() &&
-        !world_->admob_helper->rewarded_video_watched() &&
-        world_->admob_helper->GetRewardedVideoLocation() ==
-        kRewardedVideoLocationScoreScreen) {
-      flatui::StartGroup(flatui::kLayoutVerticalCenter, 10);
-      flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignCenter,
-                            mathfu::vec2(400, 10));
-      flatui::SetTextColor(kColorLightBrown);
-      auto event = ImageButtonWithLabel(
-          *button_back_, 60, flatui::Margin(60, 35, 40, 50), "Bonus XP");
-      if (event & flatui::kEventWentUp) {
-        StartRewardedVideo();
-      }
-      flatui::EndGroup();
-    }
-
     flatui::StartGroup(flatui::kLayoutHorizontalBottom, 150);
     flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignBottom,
                           mathfu::vec2(0, -125));
@@ -825,133 +776,6 @@ MenuState GameMenuState::ScoreReviewMenu(fplbase::AssetManager& assetman,
   });
 
   PopDebugMarker();  // ScoreReviewMenu
-
-  return next_state;
-}
-
-MenuState GameMenuState::ReceivedInviteMenu(fplbase::AssetManager& assetman,
-                                            flatui::FontManager& fontman,
-                                            fplbase::InputSystem& input) {
-  MenuState next_state = kMenuStateReceivedInvite;
-
-  PushDebugMarker("ReceivedInviteMenu");
-
-  EmptyMenuBackground(assetman, fontman, input, [&]() {
-    // Display a message indicating an invite was received.
-    flatui::SetTextColor(kColorBrown);
-    flatui::StartGroup(flatui::kLayoutVerticalCenter, 10);
-    flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignCenter,
-                          mathfu::kZeros2f);
-    flatui::Label("Thanks for trying Zooshi!", kButtonSize);
-    DisplayMessageUnlockable();
-    flatui::EndGroup();
-
-    if (DisplayMessageBackButton()) {
-      next_state = kMenuStateStart;
-    }
-  });
-
-  PopDebugMarker();  // ReceivedInviteMenu
-
-  return next_state;
-}
-
-MenuState GameMenuState::SentInviteMenu(fplbase::AssetManager& assetman,
-                                        flatui::FontManager& fontman,
-                                        fplbase::InputSystem& input) {
-  MenuState next_state = kMenuStateSentInvite;
-
-  PushDebugMarker("SentInviteMenu");
-
-  EmptyMenuBackground(assetman, fontman, input, [&]() {
-    // Display a message indicating invitations were sent.
-    flatui::SetTextColor(kColorBrown);
-    flatui::StartGroup(flatui::kLayoutVerticalCenter, 10);
-    flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignCenter,
-                          mathfu::kZeros2f);
-    flatui::Label("Thanks for inviting others to Zooshi!", kButtonSize);
-    DisplayMessageUnlockable();
-    flatui::EndGroup();
-
-    if (DisplayMessageBackButton()) {
-      next_state = kMenuStateStart;
-    }
-  });
-
-  PopDebugMarker();  // SentInviteMenu
-
-  return next_state;
-}
-
-MenuState GameMenuState::ReceivedMessageMenu(fplbase::AssetManager& assetman,
-                                             flatui::FontManager& fontman,
-                                             fplbase::InputSystem& input) {
-  MenuState next_state = kMenuStateReceivedMessage;
-
-  PushDebugMarker("ReceivedMessageMenu");
-
-  EmptyMenuBackground(assetman, fontman, input, [&]() {
-    // Display the message that was received.
-    flatui::SetTextColor(kColorBrown);
-    flatui::StartGroup(flatui::kLayoutVerticalCenter, 10);
-    flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignCenter,
-                          mathfu::kZeros2f);
-    flatui::Label(received_message_.c_str(), kButtonSize, kWrappedLabelSize,
-                  flatui::kTextAlignmentCenter);
-    flatui::EndGroup();
-
-    if (DisplayMessageBackButton()) {
-      next_state = kMenuStateStart;
-    }
-  });
-
-  PopDebugMarker();  // ReceivedMessageMenu
-
-  return next_state;
-}
-
-RewardedVideoState GameMenuState::RewardedVideoMenu(
-    fplbase::AssetManager& assetman, flatui::FontManager& fontman,
-    fplbase::InputSystem& input) {
-  RewardedVideoState next_state = rewarded_video_state_;
-
-  PushDebugMarker("AdMobVideoMenu");
-
-  EmptyMenuBackground(assetman, fontman, input, [&]() {
-    flatui::SetTextColor(kColorBrown);
-    flatui::StartGroup(flatui::kLayoutVerticalCenter, 10);
-    flatui::PositionGroup(flatui::kAlignCenter, flatui::kAlignCenter,
-                          mathfu::kZeros2f);
-
-    // We want to show different things based on the AdMob state.
-    if (rewarded_video_state_ == kRewardedVideoStateDisplaying) {
-      if (world_->admob_helper->rewarded_video_status() ==
-          kAdMobStatusLoading) {
-        flatui::Label("Loading video, please wait...", kButtonSize);
-      } else {
-        flatui::Label("Video loaded, please enjoy!", kButtonSize);
-      }
-    } else {
-      if (world_->admob_helper->rewarded_video_watched()) {
-        const char* label = menu_state_ == kMenuStateScoreReview
-                                ? "A bonus has been granted!"
-                                : "A bonus will be applied to your next game";
-        flatui::Label(label, kButtonSize, kWrappedLabelSize,
-                      flatui::kTextAlignmentCenter);
-      } else {
-        flatui::Label("The full video needs to be watched for the bonus",
-                      kButtonSize, kWrappedLabelSize,
-                      flatui::kTextAlignmentCenter);
-      }
-      if (DisplayMessageBackButton()) {
-        next_state = kRewardedVideoStateIdle;
-      }
-    }
-
-    flatui::EndGroup();
-  });
-
-  PopDebugMarker();  // AdMobVideoMenu
 
   return next_state;
 }

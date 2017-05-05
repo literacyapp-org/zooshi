@@ -19,7 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "admob.h"
 #include "components/attributes.h"
 #include "components/audio_listener.h"
 #include "components/lap_dependent.h"
@@ -50,8 +49,6 @@
 
 #include "mathfu/internal/disable_warnings_begin.h"
 
-#include "firebase/app.h"
-
 #include "mathfu/internal/disable_warnings_end.h"
 
 #include "fplbase/render_target.h"
@@ -59,8 +56,6 @@
 #include "inputcontrollers/base_player_controller.h"
 #include "inputcontrollers/gamepad_controller.h"
 #include "inputcontrollers/onscreen_controller.h"
-#include "invites.h"
-#include "messaging.h"
 #include "railmanager.h"
 #include "scene_lab/corgi/corgi_adapter.h"
 #include "scene_lab/corgi/edit_options.h"
@@ -126,9 +121,7 @@ struct World {
                   pindrop::AudioEngine* audio_engine,
                   breadboard::GraphFactory* graph_factory,
                   fplbase::Renderer* renderer, scene_lab::SceneLab* scene_lab,
-                  UnlockableManager* unlockable_mgr, XpSystem* xp_system,
-                  InvitesListener* invites_lstr, MessageListener* message_lstr,
-                  AdMobHelper* admob_hlpr);
+                  UnlockableManager* unlockable_mgr, XpSystem* xp_system);
 
   // Entity manager
   corgi::EntityManager entity_manager;
@@ -183,11 +176,6 @@ struct World {
   BasePlayerController* hmd_controller;
 #endif  // FPLBASE_ANDROID_VR
   BasePlayerController* onscreen_controller;
-
-  firebase::App* firebase_app;
-  InvitesListener* invites_listener;
-  MessageListener* message_listener;
-  AdMobHelper* admob_helper;
 
   // TODO: Refactor all components so they don't require their source
   // data to remain in memory after their initial load. Then get rid of this,
