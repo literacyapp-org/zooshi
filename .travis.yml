@@ -6,22 +6,31 @@ language: android
 
 android:
   components:
-    - build-tools-23.0.3
+    - tools
+    - build-tools-23.0.1
     - android-23
     - extra-google-m2repository
     - extra-android-m2repository
 
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - g++-5
+
 before_install:
-    - sudo apt-get install webp python
+    - export CXX="g++-5" CC="gcc-5"
+    - sudo apt-get update -q
+    - sudo apt-get install webp python imagemagick libglapi-mesa libgl1-mesa-dev
     - echo `python --version`
     - export ANDROID_SDK_ROOT=/usr/local/android-sdk
     - wget https://dl.google.com/android/repository/android-ndk-r14b-linux-x86_64.zip
     - unzip -qq android-ndk-r14b-linux-x86_64.zip -d $ANDROID_SDK_ROOT/ndk-bundle
     - export NDK_ROOT=$ANDROID_SDK_ROOT/ndk-bundle/android-ndk-r14b
     - echo -e "sdk.dir=$ANDROID_SDK_ROOT\nndk.dir=$NDK_ROOT\n" > local.properties
-    - wget https://dl.google.com/firebase/sdk/cpp/firebase_cpp_sdk_3.1.0.zip
-    - unzip -qq firebase_cpp_sdk_3.1.0.zip -d ./dependencies/
-    - export FIREBASE_SDK=$(pwd)/dependencies/firebase_cpp_sdk/
+    - echo `convert -list configure`
 
 script:
     - ./gradlew build

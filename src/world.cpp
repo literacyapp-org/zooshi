@@ -21,9 +21,6 @@
 
 #include "mathfu/internal/disable_warnings_begin.h"
 
-#include "firebase/analytics.h"
-#include "firebase/invites.h"
-
 #include "mathfu/internal/disable_warnings_end.h"
 
 #include "flatbuffers/flatbuffers.h"
@@ -61,9 +58,7 @@ void World::Initialize(
     fplbase::AssetManager* asset_mgr, WorldRenderer* worldrenderer,
     flatui::FontManager* font_manager, pindrop::AudioEngine* audio_engine,
     breadboard::GraphFactory* graph_factory, fplbase::Renderer* renderer,
-    SceneLab* scene_lab, UnlockableManager* unlockable_mgr, XpSystem* xpsystem,
-    InvitesListener* invites_lstr, MessageListener* message_lstr,
-    AdMobHelper* admob_hlpr) {
+    SceneLab* scene_lab, UnlockableManager* unlockable_mgr, XpSystem* xpsystem) {
   entity_factory.reset(new corgi::component_library::DefaultEntityFactory());
   motive::SplineInit::Register();
   motive::MatrixInit::Register();
@@ -196,10 +191,6 @@ void World::Initialize(
       config->rendering_config()->apply_phong_by_default_cardboard();
   rendering_options_[kRenderingStereoscopic][kSpecularEffect] =
       config->rendering_config()->apply_specular_by_default_cardboard();
-
-  invites_listener = invites_lstr;
-  message_listener = message_lstr;
-  admob_helper = admob_hlpr;
 }
 
 void World::AddController(BasePlayerController* controller) {

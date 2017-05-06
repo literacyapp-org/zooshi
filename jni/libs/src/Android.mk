@@ -59,38 +59,6 @@ endif
 PROJECT_GLOBAL_BUILD_RULES_DEFINED:=1
 
 STL:=$(firstword $(subst _, ,$(APP_STL)))
-FIREBASE_LIBRARY_PATH:=\
-$(DEPENDENCIES_FIREBASE_DIR)/libs/android/$(TARGET_ARCH_ABI)/$(STL)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_admob
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libadmob.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_app
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libapp.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_analytics
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libanalytics.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_invites
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libinvites.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_messaging
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libmessaging.a
-include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libfirebase_config
-LOCAL_SRC_FILES := $(FIREBASE_LIBRARY_PATH)/libremote_config.a
-include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
@@ -110,7 +78,6 @@ LOCAL_C_INCLUDES := \
   $(DEPENDENCIES_FPLUTIL_DIR)/libfplutil/include \
   $(DEPENDENCIES_WEBP_DIR)/src \
   $(DEPENDENCIES_BULLETPHYSICS_DIR)/src \
-  $(DEPENDENCIES_FIREBASE_DIR)/include \
   $(COMPONENTS_GENERATED_OUTPUT_DIR) \
   $(BREADBOARD_MODULE_LIBRARY_GENERATED_OUTPUT_DIR) \
   $(ZOOSHI_GENERATED_OUTPUT_DIR) \
@@ -118,8 +85,6 @@ LOCAL_C_INCLUDES := \
   $(LOCAL_PATH)/src
 
 LOCAL_SRC_FILES := \
-  src/admob.cpp \
-  src/analytics.cpp \
   src/camera.cpp \
   src/components/attributes.cpp \
   src/components/audio_listener.cpp \
@@ -147,9 +112,7 @@ LOCAL_SRC_FILES := \
   src/inputcontrollers/android_cardboard_controller.cpp \
   src/inputcontrollers/gamepad_controller.cpp \
   src/inputcontrollers/onscreen_controller.cpp \
-  src/invites.cpp \
   src/main.cpp \
-  src/messaging.cpp \
   src/modules/attributes.cpp \
   src/modules/gpg.cpp \
   src/modules/patron.cpp \
@@ -159,7 +122,6 @@ LOCAL_SRC_FILES := \
   src/modules/ui_string.cpp \
   src/modules/zooshi.cpp \
   src/railmanager.cpp \
-  src/remote_config.cpp \
   src/states/game_menu_state.cpp \
   src/states/game_over_state.cpp \
   src/states/gameplay_state.cpp \
@@ -244,13 +206,7 @@ LOCAL_STATIC_LIBRARIES := \
   libharfbuzz \
   libflatbuffers \
   libflatbuffers_extra \
-  libbullet \
-  libfirebase_admob \
-  libfirebase_analytics \
-  libfirebase_invites \
-  libfirebase_messaging \
-  libfirebase_config \
-  libfirebase_app
+  libbullet
 
 LOCAL_SHARED_LIBRARIES :=
 

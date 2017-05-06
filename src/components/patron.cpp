@@ -15,7 +15,6 @@
 #include "components/patron.h"
 
 #include <vector>
-#include "analytics.h"
 #include "components/attributes.h"
 #include "components/player.h"
 #include "components/player_projectile.h"
@@ -27,8 +26,6 @@
 #include "corgi_component_library/rendermesh.h"
 
 #include "mathfu/internal/disable_warnings_begin.h"
-
-#include "firebase/analytics.h"
 
 #include "mathfu/internal/disable_warnings_end.h"
 
@@ -676,17 +673,6 @@ void PatronComponent::HandleCollision(const corgi::EntityRef& patron_entity,
       SpawnPointDisplay(patron_entity);
       // Delete the projectile, as it has been consumed.
       entity_manager_->DeleteEntity(proj_entity);
-
-      // Track in Analytics that the patron was fed.
-      MetaData* meta_data = Data<MetaData>(patron_entity);
-      firebase::analytics::Parameter parameters[] = {
-          firebase::analytics::Parameter(kParameterPatronType,
-                                         meta_data->prototype.c_str()),
-          AnalyticsControlParameter(
-              entity_manager_->GetComponent<ServicesComponent>()->world()),
-      };
-      firebase::analytics::LogEvent(kEventPatronFed, parameters,
-                                    sizeof(parameters) / sizeof(parameters[0]));
     }
   }
 }

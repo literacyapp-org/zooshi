@@ -43,10 +43,6 @@ enum MenuState {
   kMenuStateCardboard,
   kMenuStateGamepad,
   kMenuStateScoreReview,
-  kMenuStateReceivedInvite,
-  kMenuStateSendingInvite,
-  kMenuStateSentInvite,
-  kMenuStateReceivedMessage,
   kMenuStateQuit,
 };
 
@@ -58,12 +54,6 @@ enum OptionsMenuState {
   kOptionsMenuStateRendering,
   kOptionsMenuStateSushi,
   kOptionsMenuStateLevel,
-};
-
-enum RewardedVideoState {
-  kRewardedVideoStateIdle,
-  kRewardedVideoStateDisplaying,
-  kRewardedVideoStateFinished,
 };
 
 // Constant definitions for UI elements. Colors, button sizes etc.
@@ -130,21 +120,6 @@ class GameMenuState : public StateNode {
   MenuState ScoreReviewMenu(fplbase::AssetManager& assetman,
                             flatui::FontManager& fontman,
                             fplbase::InputSystem& input);
-  MenuState ReceivedInviteMenu(fplbase::AssetManager& assetman,
-                               flatui::FontManager& fontman,
-                               fplbase::InputSystem& input);
-  MenuState SentInviteMenu(fplbase::AssetManager& assetman,
-                           flatui::FontManager& fontman,
-                           fplbase::InputSystem& input);
-  MenuState ReceivedMessageMenu(fplbase::AssetManager& assetman,
-                                flatui::FontManager& fontman,
-                                fplbase::InputSystem& input);
-  // The rewarded menu is a special case, as we don't want to change the actual
-  // menu state that is happening, as it could potentially be called from
-  // various states, and we want to go back to the same state.
-  RewardedVideoState RewardedVideoMenu(fplbase::AssetManager& assetman,
-                                       flatui::FontManager& fontman,
-                                       fplbase::InputSystem& input);
 
   // Instance a text button that plays a sound when selected.
   flatui::Event TextButton(const char* text, float size,
@@ -190,11 +165,6 @@ class GameMenuState : public StateNode {
 
   // Reset the variables concerning score.
   void ResetScore();
-
-  // Start playing a rewarded video, which takes over the menu.
-  void StartRewardedVideo();
-  // Should be called every frame to manage the rewarded video.
-  void HandleRewardedVideo();
 
   // Set to true when the render thread detects that all assets have been
   // loaded. The update thread then shows game menu.
@@ -299,9 +269,6 @@ class GameMenuState : public StateNode {
   // The message to display on the message received screen.
   std::string received_message_;
 
-  // Track the state of the UI managing rewarded video, which is done external
-  // to the MenuState to allow rewarded video offered at different states.
-  RewardedVideoState rewarded_video_state_;
 };
 
 }  // zooshi
